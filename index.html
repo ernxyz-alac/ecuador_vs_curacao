@@ -384,7 +384,7 @@
 
     async function loadData() {
         try {
-            const res = await fetch("http://localhost:9001/data?gameId=15682183");
+            const res = await fetch("https://doradobet-server.onrender.com/data?gameId=15682183");
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
 
