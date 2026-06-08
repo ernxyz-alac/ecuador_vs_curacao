@@ -265,39 +265,27 @@
         }
 
         .odd-item {
-            position: absolute; /* Needed to move independently */
+            position: absolute;
             display: flex;
-            justify-content: space-between;
-            padding: 0px 6px;
+            justify-content: center;
+            align-items: center;
+            width: 78px;
             border-radius: 8px;
         }
 
-        /* 
-           Placement for Left Odd 
-           Change 'right' and 'bottom' to move this item 
-        */
-        .odd-1 {
-            right: 212px;
-            bottom: -7px;
-        }
+        /* Dynamic positioning based on digit count */
+        /* odd-1: 2 digits -> 205px, 1 digit -> 215px */
+        .odd-1.digits-2 { right: 205px; bottom: -7px; }
+        .odd-1.digits-1 { right: 215px; bottom: -7px; }
+        
+        /* odd-2: 2 digits -> 110px, 1 digit -> 120px */
+        .odd-2.digits-2 { right: 110px; bottom: -7px; }
+        .odd-2.digits-1 { right: 120px; bottom: -7px; }
+        
+        /* odd-3: 2 digits -> 40px, 1 digit -> 30px */
+        .odd-3.digits-2 { right: 30px; bottom: -7px; }
+        .odd-3.digits-1 { right: 40px; bottom: -7px; }
 
-        /* 
-           Placement for Center Odd 
-           Change 'right' and 'bottom' to move this item 
-        */
-        .odd-2 {
-            right: 115px;
-            bottom: -7px;
-        }
-
-        /* 
-           Placement for Right Odd 
-           Change 'right' and 'bottom' to move this item 
-        */
-        .odd-3 {
-            right: 15px;
-            bottom: -7px;
-        }
 
         .odd-name {
             font-weight: 500;
@@ -307,7 +295,7 @@
 
         .odd-price {
             font-weight: bold;
-            font-size: 40px;
+            font-size: 37px;
             color: white;
         }
     </style>
@@ -457,8 +445,11 @@
                 .map((o, index) => {
                     const [name, price] = o.split(" -> ");
                     const rightPrice = parseFloat(price).toFixed(2);
+                    const integerPart = rightPrice.split(".")[0];
+                    const digits = integerPart.length;
+                    
                     return `
-                        <div class="odd-item odd-${index + 1}">
+                        <div class="odd-item odd-${index + 1} digits-${digits}">
                             <span class="odd-price">${rightPrice}</span>
                         </div>
                     `;
