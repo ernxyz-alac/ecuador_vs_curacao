@@ -273,18 +273,18 @@
             border-radius: 8px;
         }
 
-        /* Dynamic positioning based on digit count */
-        /* odd-1: 2 digits -> 205px, 1 digit -> 215px */
-        .odd-1.digits-2 { right: 205px; bottom: -7px; }
-        .odd-1.digits-1 { right: 215px; bottom: -7px; }
+        /* Dynamic positioning based on digit count - using vw/vh units */
+        /* odd-1: 2 digits -> 10.7vw, 1 digit -> 11.2vw */
+        .odd-1.digits-2 { right: 27vw; bottom: -2.5vh; }
+        .odd-1.digits-1 { right: 28vw; bottom: -2.5vh; }
         
-        /* odd-2: 2 digits -> 110px, 1 digit -> 120px */
-        .odd-2.digits-2 { right: 110px; bottom: -7px; }
-        .odd-2.digits-1 { right: 120px; bottom: -7px; }
+        /* odd-2: 2 digits -> 5.7vw, 1 digit -> 6.25vw */
+        .odd-2.digits-2 { right: 14.7vw; bottom: -2.5vh; }
+        .odd-2.digits-1 { right: 16vw; bottom: -2.5vh; }
         
-        /* odd-3: 2 digits -> 40px, 1 digit -> 30px */
-        .odd-3.digits-2 { right: 30px; bottom: -7px; }
-        .odd-3.digits-1 { right: 40px; bottom: -7px; }
+        /* odd-3: 2 digits -> 1.6vw, 1 digit -> 2.1vw */
+        .odd-3.digits-2 { right: 3.8vw; bottom: -2.5vh; }
+        .odd-3.digits-1 { right: 5vw; bottom: -2.5vh; }
 
 
         .odd-name {
