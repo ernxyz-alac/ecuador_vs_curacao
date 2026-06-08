@@ -373,8 +373,8 @@
         try {
             const res = await fetch("http://localhost:9001/data?gameId=15682183");
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        
-        
+
+
             const data = await res.json();
 
             // Update basic info
@@ -483,7 +483,6 @@
         document.body.style.backgroundSize = 'cover';
         document.body.style.backgroundPosition = 'center';
         document.body.style.backgroundRepeat = 'no-repeat';
-        console.log('Background image loaded successfully');
     };
     bgImage.onerror = () => {
         console.error('Failed to load background image, retrying in 2 seconds...');
@@ -492,7 +491,7 @@
     bgImage.src = 'public/img/bg.jpeg';
 }
 
-loadBackgroundImage(); 
+loadBackgroundImage();
     // Load immediately, then every 10 seconds
     loadData();
     setInterval(loadData, 10000);
