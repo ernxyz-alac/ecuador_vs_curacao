@@ -244,19 +244,31 @@
         .odds {
             z-index: 9999;
             position: absolute;
-            bottom: 45px;
-            right: 55px;
+            bottom: 10%;
+            right: 5%;
         }
 
         #odds {
             display: flex;
+            flex-direction: row;
+            gap: 10px;
+            align-items: center;
         }
 
-        /* Target the second .odd-item (middle one) */
-/* Make the middle one black */
-#odds .odd-item:nth-child(2) .odd-price {
-    color: black !important;
-}
+        /* Digit-specific adjustments */
+        .odd-1.digits-1 { margin-right: 5px; }
+        .odd-1.digits-2 { margin-right: 0px; }
+
+        .odd-2.digits-1 { margin-right: -8px; }
+        .odd-2.digits-2 { margin-right: 0px; }
+
+        .odd-3.digits-1 { margin-right: 55px; }
+        .odd-3.digits-2 { margin-right: 0px; }
+
+        /* Make the middle one black */
+        #odds .odd-item:nth-child(2) .odd-price {
+            color: black !important;
+        }
 
         .odds h3 {
             margin-bottom: 10px;
@@ -265,32 +277,13 @@
         }
 
         .odd-item {
-            position: absolute;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 78px;
+            width: 80px;
             border-radius: 8px;
+            padding: 5px;
         }
-
-        #odds {
-            width: 100vw;
-            height: 100vh;
-        }
-
-        /* Dynamic positioning based on digit count - using % units */
-        /* odd-1: 2 digits -> 20.5%, 1 digit -> 21.5% */
-        .odd-1.digits-2 { right: 27%; bottom: -2%; }
-        .odd-1.digits-1 { right: 28%; bottom: -2%; }
-
-        /* odd-2: 2 digits -> 11.0%, 1 digit -> 12.0% */
-        .odd-2.digits-2 { right: 15%; bottom: -2%; }
-        .odd-2.digits-1 { right: 16.0%; bottom: -2%; }
-
-        /* odd-3: 2 digits -> 3.0%, 1 digit -> 4.0% */
-        .odd-3.digits-2 { right: 4%; bottom: -2%; }
-        .odd-3.digits-1 { right: 5%; bottom: -2%; }
-
 
         .odd-name {
             font-weight: 500;
@@ -453,8 +446,9 @@
                     const integerPart = rightPrice.split(".")[0];
                     const digits = integerPart.length;
                     
+                        // <div class="odd-item odd-${index + 1} digits-${digits}">
                     return `
-                        <div class="odd-item odd-${index + 1} digits-${digits}">
+                        <div class="odd-item odd-${index + 1} digits-${1}">
                             <span class="odd-price">${rightPrice}</span>
                         </div>
                     `;
