@@ -265,13 +265,38 @@
         }
 
         .odd-item {
+            position: absolute; /* Needed to move independently */
             display: flex;
             justify-content: space-between;
-            /* padding: clamp(6px, 1.5vw, 8px) clamp(8px, 2vw, 12px); */
             padding: 0px 6px;
             border-radius: 8px;
-            margin-bottom: 6px;
-            margin: 8px 4px;
+        }
+
+        /* 
+           Placement for Left Odd 
+           Change 'right' and 'bottom' to move this item 
+        */
+        .odd-1 {
+            right: 212px;
+            bottom: -7px;
+        }
+
+        /* 
+           Placement for Center Odd 
+           Change 'right' and 'bottom' to move this item 
+        */
+        .odd-2 {
+            right: 115px;
+            bottom: -7px;
+        }
+
+        /* 
+           Placement for Right Odd 
+           Change 'right' and 'bottom' to move this item 
+        */
+        .odd-3 {
+            right: 15px;
+            bottom: -7px;
         }
 
         .odd-name {
@@ -429,11 +454,11 @@
             const oddsContainer = document.getElementById("odds");
             oddsContainer.innerHTML = data.odds
                 .split("\n")
-                .map(o => {
+                .map((o, index) => {
                     const [name, price] = o.split(" -> ");
-                    const rightPrice = parseFloat(price).toFixed(2); // remove toFixed in real
+                    const rightPrice = parseFloat(price).toFixed(2);
                     return `
-                        <div class="odd-item">
+                        <div class="odd-item odd-${index + 1}">
                             <span class="odd-price">${rightPrice}</span>
                         </div>
                     `;
