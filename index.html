@@ -289,7 +289,7 @@
 </head>
 <body>
 <div id="main-container">
-    <img class="bg-image" src="/img/bg.jpeg" alt="background">
+    <img class="bg-image" src="public/img/bg.jpeg" alt="background">
 
     <!-- Goal Celebration Screen -->
     <!-- <div id="goalScreen" class="goal-screen"></div> -->
@@ -371,8 +371,8 @@
 
     async function loadData() {
         try {
-                    const res = await fetch("/data");
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            const res = await fetch("http://localhost:9001/data?gameId=15682183");
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         
         
             const data = await res.json();
@@ -479,7 +479,7 @@
     function loadBackgroundImage() {
     const bgImage = new Image();
     bgImage.onload = () => {
-        document.body.style.backgroundImage = `url('/img/bg.jpeg')`;
+        document.body.style.backgroundImage = `url('public/img/bg.jpeg')`;
         document.body.style.backgroundSize = 'cover';
         document.body.style.backgroundPosition = 'center';
         document.body.style.backgroundRepeat = 'no-repeat';
@@ -489,7 +489,7 @@
         console.error('Failed to load background image, retrying in 2 seconds...');
         setTimeout(loadBackgroundImage, 2000); // Retry after 2 seconds
     };
-    bgImage.src = '/img/bg.jpeg';
+    bgImage.src = 'public/img/bg.jpeg';
 }
 
 loadBackgroundImage(); 
