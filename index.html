@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Live Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        /* Dynamic dimensions - fills 100% of parent container */
+        :root {
+            --screen-width: 100vw;
+            --screen-height: 100vh;
+
+            --team-name-size: clamp(16px, 4vw, 20px);
+            --vs-size: clamp(18px, 5vw, 24px);
+            --score-size: clamp(32px, 8vw, 48px);
+            --odd-size: clamp(11px, 2.5vw, 14px);
+            --goal-text-size: clamp(32px, 8vw, 48px);
+            --ad-text-size: clamp(18px, 4vw, 24px);
+        }
+
+        /* Full background image container */
+        .bg-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            z-index: 0;
+        }
+
+        /* Main container - fills entire parent */
+        #main-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Card overlay - semi-transparent background for readability */
+        .card {
+            position: absolute;
+            z-index: 2;
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: clamp(12px, 3vw, 16px);
+            padding: clamp(12px, 3vw, 16px) clamp(16px, 4vw, 24px);
+            width: 90%;
+            max-width: 500px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: opacity 0.3s ease;
+        }
+
+        /* Goal celebration screen */
+        .goal-screen {
+            position: absolute;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease;
+            text-align: center;
+        }
+
+        .goal-screen.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Goal reaction (first 2 seconds) */
+        .goal-reaction {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: celebrate 0.5s ease-out;
+        }
+
+        /* Ad display (next 5 seconds) */
+        .ad-display {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .goal-text {
+            font-size: var(--goal-text-size);
+            font-weight: bold;
+            color: white;
+            text-shadow: 4px 4px 8px rgba(0,0,0,0.3);
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        .goal-team {
+            font-size: clamp(24px, 6vw, 32px);
+            font-weight: bold;
+            color: white;
+            margin-top: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .ad-text {
+            font-size: var(--ad-text-size);
+            font-weight: bold;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .ad-logo {
+            font-size: clamp(36px, 10vw, 48px);
+            margin-bottom: 20px;
+            animation: bounce 1s ease-in-out infinite;
+        }
+
+        .sponsor-name {
+            font-size: clamp(24px, 6vw, 36px);
+            font-weight: bold;
+            color: #ffd700;
+            letter-spacing: 2px;
+        }
+
+        /* Test button */
+        .test-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 20;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .test-btn:hover {
+            background: #ffd700;
+            color: black;
+            transform: scale(1.05);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes celebrate {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .title {
+            font-size: clamp(18px, 4.5vw, 22px);
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 8px;
+            color: #e5e7eb;
+            word-break: break-word;
+        }
+
+        .time {
+            text-align: center;
+            font-size: clamp(11px, 2.5vw, 13px);
+            color: #9ca3af;
+            margin-bottom: 12px;
+        }
+
+        .score {
+            text-align: center;
+            font-size: var(--score-size);
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .odds {
+            z-index: 9999;
+            position: absolute;
+            bottom: 45px;
+            right: 55px;
+        }
+
+        #odds {
+            display: flex;
+        }
+
+        /* Target the second .odd-item (middle one) */
+/* Make the middle one black */
+#odds .odd-item:nth-child(2) .odd-price {
+    color: black !important;
+}
+
+        .odds h3 {
+            margin-bottom: 10px;
+            font-size: clamp(14px, 3.5vw, 16px);
+            color: #e5e7eb;
+        }
+
+        .odd-item {
+            display: flex;
+            justify-content: space-between;
+            /* padding: clamp(6px, 1.5vw, 8px) clamp(8px, 2vw, 12px); */
+            padding: 0px 6px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            margin: 8px 4px;
+        }
+
+        .odd-name {
+            font-weight: 500;
+            font-size: var(--odd-size);
+            color: #e5e7eb;
+        }
+
+        .odd-price {
+            font-weight: bold;
+            font-size: 40px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div id="main-container">
+    <img class="bg-image" src="/img/bg.jpeg" alt="background">
+
+    <!-- Goal Celebration Screen -->
+    <!-- <div id="goalScreen" class="goal-screen"></div> -->
+
+    <!-- <div id="mainCard" class="card"> -->
+        <!-- <div id="name" class="title"></div>
+        <div id="time" class="time"></div>
+        <div id="score" class="score"></div> -->
+
+    <!-- </div> -->
+    <div class="odds">
+        <!-- <h3>Odds</h3> -->
+        <div id="odds"></div>
+    </div>
+
+    <!-- Test Button -->
+    <!-- <button id="testGoalBtn" class="test-btn">🎯 TEST</button> -->
+</div>
+
+<script>
+    let previousScore = "";
+    let previousNumbers = [0, 0];
+    let previousTeams = ["", ""];
+    let goalTimeout = null;
+    let celebrationActive = false;
+
+    // Show goal celebration with 2 sec reaction + 5 sec ad = 7 sec total
+    function showGoal(teamName) {
+        if (celebrationActive) return;
+
+        celebrationActive = true;
+        // const goalScreen = document.getElementById('goalScreen');
+        // const mainCard = document.getElementById('mainCard');
+
+        // Hide main card
+        // mainCard.style.opacity = '0';
+
+        // Create goal reaction (first 2 seconds)
+        const goalReaction = document.createElement('div');
+        goalReaction.className = 'goal-reaction';
+        goalReaction.innerHTML = `
+            <div class="goal-text">⚽ GOOOOOL! ⚽</div>
+            <div class="goal-team">de ${teamName}! 🎉</div>
+        `;
+
+        // Clear screen and add reaction
+        // goalScreen.innerHTML = '';
+        // goalScreen.appendChild(goalReaction);
+        // goalScreen.classList.add('show');
+
+        // After 2 seconds, switch to ad (5 seconds)
+        setTimeout(() => {
+            // Remove reaction
+            goalReaction.style.opacity = '0';
+
+            // Create ad display
+            const adDisplay = document.createElement('div');
+            adDisplay.className = 'ad-display';
+            adDisplay.innerHTML = `
+                <div class="ad-logo">🎰</div>
+                <div class="ad-text">¡Apuesta ahora en!</div>
+                <div class="sponsor-name">DORADOBET</div>
+                <div class="ad-text" style="font-size: clamp(12px, 3vw, 16px); margin-top: 20px;">Las mejores cuotas del momento</div>
+            `;
+
+            // goalScreen.innerHTML = '';
+            // goalScreen.appendChild(adDisplay);
+        }, 2000);
+
+        // After total 7 seconds (2s reaction + 5s ad), hide everything
+        if (goalTimeout) clearTimeout(goalTimeout);
+        goalTimeout = setTimeout(() => {
+            // goalScreen.classList.remove('show');
+            // goalScreen.innerHTML = '';
+            // mainCard.style.opacity = '1';
+            celebrationActive = false;
+        }, 7000);
+    }
+
+    async function loadData() {
+        try {
+                    const res = await fetch("/data");
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        
+        
+            const data = await res.json();
+
+            // Update basic info
+            const matchName = data.name;
+            // document.getElementById("name").textContent = matchName;
+            // document.getElementById("time").textContent = "Tiempo: " + data.time;
+
+            // Get team names in order
+            const teams = matchName.split(" vs. ");
+
+            // Get score from the score string (format: "Team A -> 2, Team B -> 1")
+            const scoreParts = data.score.split(", ");
+            let scoreText = "";
+            let currentNumbers = [0, 0];
+
+            if (scoreParts.length === 2) {
+                // Extract just the numbers for display
+                const homeScore = scoreParts[0].split(" -> ")[1];
+                const awayScore = scoreParts[1].split(" -> ")[1];
+                scoreText = `${homeScore} - ${awayScore}`;
+                currentNumbers = [parseInt(homeScore), parseInt(awayScore)];
+            }
+
+            // document.getElementById("score").textContent = scoreText;
+
+            // Check for goal (score change) - CLIENT SIDE DETECTION
+            if (previousScore !== scoreText && previousScore !== "") {
+                // Find which team scored based on index order [0] = first team, [1] = second team
+                let scoringTeam = null;
+
+                // Check first team (index 0)
+                if (currentNumbers[0] > previousNumbers[0]) {
+                    scoringTeam = teams[0];
+                }
+                // Check second team (index 1)
+                else if (currentNumbers[1] > previousNumbers[1]) {
+                    scoringTeam = teams[1];
+                }
+
+                if (scoringTeam) {
+                    console.log(`GOAL! ${scoringTeam} scored! Score changed from ${previousNumbers[0]}-${previousNumbers[1]} to ${currentNumbers[0]}-${currentNumbers[1]}`);
+                    showGoal(scoringTeam);
+                }
+            }
+
+            // Update previous values
+            previousScore = scoreText;
+            previousNumbers = [...currentNumbers];
+            previousTeams = [...teams];
+
+            // Update odds
+            const oddsContainer = document.getElementById("odds");
+            oddsContainer.innerHTML = data.odds
+                .split("\n")
+                .map(o => {
+                    const [name, price] = o.split(" -> ");
+                    const rightPrice = parseFloat(price).toFixed(2); // remove toFixed in real
+                    return `
+                        <div class="odd-item">
+                            <span class="odd-price">${rightPrice}</span>
+                        </div>
+                    `;
+                })
+                .join("");
+        } catch (error) {
+            console.error("Error loading data:", error);
+             setTimeout(loadData, 5000);
+        }
+    }
+
+    // Test button handler - Simulate a goal by incrementing a random team's score
+    function testGoal() {
+        const matchName = document.getElementById("name").textContent;
+        const teams = matchName.split(" vs. ");
+
+        // Get current score text and parse numbers
+        const scoreText = document.getElementById("score").textContent;
+        const currentScores = scoreText.split(" - ").map(Number);
+
+        // Choose random team (0 or 1)
+        const teamIndex = Math.floor(Math.random() * 2);
+        const scoringTeam = teams[teamIndex];
+
+        // Manually trigger goal celebration
+        console.log(`TEST GOAL! ${scoringTeam} scored!`);
+        showGoal(scoringTeam);
+    }
+
+    // Add test button event listener
+    // document.getElementById('testGoalBtn').addEventListener('click', testGoal);
+
+    // Get URL parameters for specific dimensions (if passed from parent iframe)
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetWidth = urlParams.get('width');
+    const targetHeight = urlParams.get('height');
+
+    if (targetWidth && targetHeight) {
+        document.documentElement.style.setProperty('--screen-width', targetWidth + 'px');
+        document.documentElement.style.setProperty('--screen-height', targetHeight + 'px');
+    }
+
+    function loadBackgroundImage() {
+    const bgImage = new Image();
+    bgImage.onload = () => {
+        document.body.style.backgroundImage = `url('/img/bg.jpeg')`;
+        document.body.style.backgroundSize = 'cover';
+        document.body.style.backgroundPosition = 'center';
+        document.body.style.backgroundRepeat = 'no-repeat';
+        console.log('Background image loaded successfully');
+    };
+    bgImage.onerror = () => {
+        console.error('Failed to load background image, retrying in 2 seconds...');
+        setTimeout(loadBackgroundImage, 2000); // Retry after 2 seconds
+    };
+    bgImage.src = '/img/bg.jpeg';
+}
+
+loadBackgroundImage(); 
+    // Load immediately, then every 10 seconds
+    loadData();
+    setInterval(loadData, 10000);
+</script>
+</body>
+</html>
